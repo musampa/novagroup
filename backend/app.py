@@ -6,8 +6,12 @@ from routes.vestiario_routes import vestiario_blueprint
 from routes.magazzino_routes import magazzino_blueprint
 from routes.mezzi_routes import mezzi_blueprint
 from exstensions import mongo  # Importa mongo correttamente dal modulo extensions
+from flask_cors import CORS  # Importa CORS
 
 app = Flask(__name__)
+
+# Permetti richieste da http://localhost:5173
+CORS(app, origins=["http://localhost:5173"])
 
 # Configurazione MongoDB
 app.config["MONGO_URI"] = "mongodb://localhost:27017/nuova"  # Modifica in base alla tua configurazione

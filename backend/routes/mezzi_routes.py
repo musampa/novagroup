@@ -1,39 +1,68 @@
 from flask import Blueprint, request, jsonify
 from bson.objectid import ObjectId
 
+# Crea un'istanza di Blueprint
 mezzi_blueprint = Blueprint("mezzi", __name__)
 
-# MongoDB collection
-def get_collection():
+# Funzione per ottenere la collezione MongoDB
+def get_mezzi_collection():
     from app import mongo
     return mongo.db.mezzi
 
-# Crea un nuovo mezzo
+# Creazione di un nuovo mezzo
 @mezzi_blueprint.route("/", methods=["POST"])
 def create_mezzo():
     data = request.get_json()
-    mezzo_id = get_collection().insert_one(data).inserted_id
-    return jsonify({"message": "Mezzo creato", "id": str(mezzo_id)}), 201
+    if not data:
+        return jsonify({"error": "Dati non forniti"}), 400
 
-# Ottieni tutti i mezzi
-@mezzi_blueprint.route("/", methods=["GET"])
-def get_mezzi():
-    mezzi = get_collection().find()
-    return jsonify([mezzo for mezzo in mezzi])
+    # Validazione dei campi richiesti
+    required_fields = ["tipo", "matricola", "stato", "filiale"]
+    missing_fields = [field for field in required_fields if field not in data]
+    if missing_fields:
+        return jsonify({"error": f"Campi mancanti: {', '.join(missing_fields)}"}), 400
 
-# Aggiorna un mezzo
-@mezzi_blueprint.route("/<id>", methods=["PUT"])
-def update_mezzo(id):
-    data = request.get_json()
-    result = get_collection().update_one({"_id": ObjectId(id)}, {"$set": data})
-    if result.matched_count:
-        return jsonify({"message": "Mezzo aggiornato"}), 200
-    return jsonify({"error": "Mezzo non trovato"}), 404
+    if data["stato"] not in ["Funzionante", "Non Funzionante"]:
+        return jsonify({"error": "Il campo 'stato' deve essere 'Funzionante' o 'Non Funzionante'"}), 400
 
-# Elimina un mezzo
+    try:
+        mezzo_id = get_mezzi_collection().insert_one(data).inserted_id
+        return jsonify({"message": "Mezzo creato con successo", "id": str(mezzo_id)}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Cancellazione di un mezzo tramite ID
 @mezzi_blueprint.route("/<id>", methods=["DELETE"])
 def delete_mezzo(id):
-    result = get_collection().delete_one({"_id": ObjectId(id)})
-    if result.deleted_count:
-        return jsonify({"message": "Mezzo eliminato"}), 200
-    return jsonify({"error": "Mezzo non trovato"}), 404
+    try:
+        result = get_mezzi_collection().delete_one({"_id": ObjectId(id)})
+        if result.deleted_count == 0:
+            return jsonify({"error": "Mezzo non trovato"}), 404
+        return jsonify({"message": "Mezzo cancellato con successo"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Visualizzazione di tutti i mezzi
+@mezzi_blueprint.route("/", methods=["GET"])
+def get_mezzi():
+    try:
+        mezzi = get_mezzi_collection().find()
+        result = []
+        for mezzo in mezzi:
+            mezzo["_id"] = str(mezzo["_id"])
+            result.append(mezzo)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Visualizzazione di un mezzo tramite ID
+@mezzi_blueprint.route("/<id>", methods=["GET"])
+def get_mezzo_by_id(id):
+    try:
+        mezzo = get_mezzi_collection().find_one({"_id": ObjectId(id)})
+        if not mezzo:
+            return jsonify({"error": "Mezzo non trovato"}), 404
+        mezzo["_id"] = str(mezzo["_id"])
+        return jsonify(mezzo), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
