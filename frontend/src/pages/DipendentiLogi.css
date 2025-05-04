@@ -1,0 +1,41 @@
+
+.table-container {
+    margin: 20px;
+  }
+  
+  .interactive-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .interactive-table th,
+  .interactive-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .interactive-table th {
+    background-color: #f3f4f6;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .interactive-table th input {
+    margin-top: 5px;
+    width: 100%;
+  }
+  
+  .interactive-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .interactive-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .interactive-table td {
+    color: #555;
+  }

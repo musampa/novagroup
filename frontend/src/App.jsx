@@ -6,6 +6,8 @@ import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import DipendentiNova from "./pages/DipendentiNova";
+import DipendentiLogi from "./pages/DipendentiLogi";
+import CreaDipendente from "./pages/CreaDipendente";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Stato di login
@@ -42,6 +44,8 @@ export default function App() {
               <>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/dipendenti/nova" element={<DipendentiNova />} />
+                <Route path="/dipendenti/logi" element={<DipendentiLogi />} />
+                <Route path="/dipendenti/crea" element={<CreaDipendente />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
               </>
             ) : (

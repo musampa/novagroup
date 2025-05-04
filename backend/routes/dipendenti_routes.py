@@ -12,7 +12,9 @@ def get_collection():
 @dipendenti_blueprint.route("/", methods=["POST"])
 def create_dipendente():
     data = request.get_json()
+    print("Dati ricevuti:", data)  # Log dei dati ricevuti
     dipendente_id = get_collection().insert_one(data).inserted_id
+    print("Dipendente creato con ID:", dipendente_id)  # Log dell'ID creato
     return jsonify({"message": "Dipendente creato", "id": str(dipendente_id)}), 201
 
 @dipendenti_blueprint.route("/", methods=["GET"])
