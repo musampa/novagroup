@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function EmployeeTable({ employees }) {
+export default function EmployeeTable({ employees, onEdit, onDelete }) {
   return (
     <table>
       <thead>
@@ -10,6 +10,7 @@ export default function EmployeeTable({ employees }) {
           <th>Nome</th>
           <th>Mansione</th>
           <th>Filiale</th>
+          <th>Azioni</th>
         </tr>
       </thead>
       <tbody>
@@ -20,6 +21,10 @@ export default function EmployeeTable({ employees }) {
             <td>{employee.nome}</td>
             <td>{employee.mansione}</td>
             <td>{employee.filiale_name}</td>
+            <td>
+              <button className="edit-btn" onClick={() => onEdit(employee)}>Modifica</button>
+              <button className="delete-btn" onClick={() => onDelete(employee.id)}>Elimina</button>
+            </td>
           </tr>
         ))}
       </tbody>
