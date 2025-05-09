@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./CreaDipendente.css"; // Stile per il modulo
 
-export default function CreaDipendente() {
+const CreaDipendente = () => {
   const [formData, setFormData] = useState({
     cognome: "",
     nome: "",
@@ -45,30 +45,51 @@ export default function CreaDipendente() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Validazione dei campi obbligatori
     const { cognome, nome, mansione, divisione, filiale } = formData;
     if (!cognome || !nome || !mansione || !divisione || !filiale) {
-      alert("Tutti i campi sono obbligatori!");
-      return;
+        alert("Tutti i campi sono obbligatori!");
+        return;
     }
 
-    // Invia i dati al backend
-    console.log("Form inviato con i seguenti dati:", formData);
-    alert("Dipendente creato con successo!");
+    try {
+        // Invia i dati al backend
+        const response = await fetch("/api/dipendenti", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                cognome,
+                nome,
+                mansione,
+                divisione,
+                filiale_id: filiale, // Usa il campo corretto
+            }),
+        });
 
-    // Reset del modulo
-    setFormData({
-      cognome: "",
-      nome: "",
-      mansione: "",
-      divisione: "",
-      filiale: "",
-    });
-    setFiliali([]);
-  };
+        if (!response.ok) {
+            throw new Error("Errore durante la creazione del dipendente");
+        }
+
+        const data = await response.json();
+        console.log("Dipendente creato con successo:", data);
+        alert("Dipendente creato con successo!");
+
+        // Reset del modulo
+        setFormData({
+            cognome: "",
+            nome: "",
+            mansione: "",
+            divisione: "",
+            filiale: "",
+        });
+        setFiliali([]);
+    } catch (error) {
+        console.error("Errore:", error.message);
+        alert("Errore durante la creazione del dipendente");
+    }
+};
 
   return (
     <div className="form-wrapper">
@@ -144,4 +165,6 @@ export default function CreaDipendente() {
       </form>
     </div>
   );
-}
+};
+
+export default CreaDipendente;

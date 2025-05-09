@@ -8,15 +8,26 @@ def get_collection():
     from app import mongo
     return mongo.db.dipendenti
 
-# Crea un nuovo dipendente
 @dipendenti_blueprint.route("/", methods=["POST"])
 def create_dipendente():
-    data = request.get_json()
-    print("Dati ricevuti:", data)  # Log dei dati ricevuti
-    dipendente_id = get_collection().insert_one(data).inserted_id
-    print("Dipendente creato con ID:", dipendente_id)  # Log dell'ID creato
-    return jsonify({"message": "Dipendente creato", "id": str(dipendente_id)}), 201
+    try:
+        data = request.get_json()
+        print("Dati ricevuti:", data)  # Log dei dati ricevuti
 
+
+        # Controlla che i campi obbligatori siano presenti
+        required_fields = ["cognome", "nome", "mansione", "divisione", "filiale_id"]
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"Campo mancante: {field}"}), 400
+
+        # Inserisci il dipendente
+        dipendente_id = get_collection().insert_one(data).inserted_id
+        print("Dipendente creato con ID:", dipendente_id)  # Log dell'ID creato
+        return jsonify({"message": "Dipendente creato", "id": str(dipendente_id)}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 @dipendenti_blueprint.route("/", methods=["GET"])
 def get_dipendenti():
     try:
@@ -28,8 +39,28 @@ def get_dipendenti():
         if divisione:
             query["divisione"] = divisione
 
-        # Recupera i dipendenti dal database
-        dipendenti = list(get_collection().find(query))
+        # Usa un'aggregazione per unire i dati della collezione 'filiali'
+        dipendenti = list(
+            get_collection().aggregate([
+                {
+                    "$match": query  # Filtra i dipendenti in base ai parametri (es. divisione)
+                },
+                {
+                    "$lookup": {
+                        "from": "filiali",  # Nome della collezione 'filiali'
+                        "localField": "filiale_id",  # Campo in 'dipendenti' che collega le due collezioni
+                        "foreignField": "filiale_id",  # Campo in 'filiali' da unire
+                        "as": "filiale_info"  # Nome del campo per le informazioni sulla filiale
+                    }
+                },
+                {
+                    "$unwind": {  # Scompatta l'array 'filiale_info'
+                        "path": "$filiale_info",
+                        "preserveNullAndEmptyArrays": True  # Mantieni il documento anche se non c'è una corrispondenza
+                    }
+                }
+            ])
+        )
 
         # Prepara la risposta JSON
         response = [
@@ -40,7 +71,7 @@ def get_dipendenti():
                 "mansione": dipendente.get("mansione"),
                 "divisione": dipendente.get("divisione"),
                 "filiale_id": dipendente.get("filiale_id"),
-                "filiale_nome": dipendente.get("filiale_nome", "Sconosciuta")  # Usa un valore predefinito se mancante
+                "filiale_nome": dipendente.get("filiale_info", {}).get("filiale_cantiere", "Sconosciuta")  # Recupera il nome della filiale o "Sconosciuta" se manca
             }
             for dipendente in dipendenti
         ]
