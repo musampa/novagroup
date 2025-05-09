@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from bson.objectid import ObjectId
+from database import db
 
 # Crea un'istanza di Blueprint
 vestiario_blueprint = Blueprint("vestiario", __name__)
@@ -101,3 +102,26 @@ def assegna_capo():
         return jsonify({"message": "Capo assegnato con successo"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Aggiungere un nuovo capo
+@vestiario_blueprint.route('/api/vestiario', methods=['POST'])
+def add_vestiario():
+    data = request.get_json()
+
+    tipo = data.get('tipo')
+    taglia = data.get('taglia')
+    quantita = data.get('quantita')
+
+    if not tipo or not taglia or not quantita:
+        return jsonify({'error': 'Dati mancanti'}), 400
+
+    # Inserimento nel database
+    nuovo_vestiario = {
+        'tipo': tipo,
+        'taglia': taglia,
+        'quantita': quantita
+    }
+
+    db.vestiario.insert_one(nuovo_vestiario)
+
+    return jsonify({'message': 'Vestiario aggiunto con successo!'}), 201

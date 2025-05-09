@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import DipendentiNova from "./pages/DipendentiNova";
 import DipendentiLogi from "./pages/DipendentiLogi";
 import CreaDipendente from "./pages/CreaDipendente";
+import InsertVestiario from "./pages/InsertVestiario";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Stato di login
@@ -46,6 +47,7 @@ export default function App() {
                 <Route path="/dipendenti/nova" element={<DipendentiNova />} />
                 <Route path="/dipendenti/logi" element={<DipendentiLogi />} />
                 <Route path="/dipendenti/crea" element={<CreaDipendente />} />
+                <Route path="/vestiario/inserisci" element={<InsertVestiario />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
               </>
             ) : (

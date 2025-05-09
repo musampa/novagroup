@@ -1,0 +1,48 @@
+/* Tema scuro */
+body.dark-theme {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+/* Tema chiaro */
+body {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Stile per tabelle */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 18px;
+  text-align: left;
+}
+
+table th, table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f4f4f4;
+}
+
+/* Pulsanti per azioni */
+button.action-btn {
+  padding: 5px 10px;
+  margin: 0 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button.edit-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+button.delete-btn {
+  background-color: #f44336;
+  color: white;
+}

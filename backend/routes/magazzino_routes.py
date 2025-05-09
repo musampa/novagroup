@@ -4,10 +4,34 @@ from bson.json_util import dumps
 from routes.filiali_routes import filiali_blueprint
 from routes.dipendenti_routes import dipendenti_blueprint
 from routes.vestiario_routes import vestiario_blueprint
-from routes.magazzino_routes import magazzino_blueprint
 from routes.mezzi_routes import mezzi_blueprint
-from routes.magazzino_routes import magazzino_blueprint
+from flask import Blueprint
 from exstensions import mongo
+
+from flask import Blueprint
+
+# Definizione del blueprint
+magazzino_blueprint = Blueprint('magazzino', __name__)
+
+# Esempio di rotta nel blueprint
+@magazzino_blueprint.route('/example')
+def example_endpoint():
+    return {"message": "Esempio di endpoint per il magazzino"}
+
+@magazzino_blueprint.route('/inserisci', methods=['POST'])
+def inserisci_magazzino():
+    from flask import request
+    try:
+        # Recupera i dati dal corpo della richiesta
+        dati = request.get_json()
+        if not dati:
+            return {"message": "Dati mancanti"}, 400
+
+        # Inserisce i dati nella collezione "magazzino"
+        mongo.db.magazzino.insert_many(dati)
+        return {"message": "Dati inseriti con successo"}, 201
+    except Exception as e:
+        return {"message": "Errore durante l'inserimento", "error": str(e)}, 500
 
 app = Flask(__name__)
 
