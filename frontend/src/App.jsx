@@ -9,6 +9,7 @@ import DipendentiNova from "./pages/DipendentiNova";
 import DipendentiLogi from "./pages/DipendentiLogi";
 import CreaDipendente from "./pages/CreaDipendente";
 import InsertVestiario from "./pages/InsertVestiario";
+import "./styles/global.css";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Stato di login

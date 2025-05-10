@@ -1,23 +1,15 @@
-:root {
-  --background-color: #121212;
-  --text-color: #ffffff;
-  --primary-color: #1e88e5;
-  --secondary-color: #424242;
-  --border-color: #333333;
-  --hover-color: #1a73e8;
-}
-
+/* Rimosso il tema scuro e ripristinati gli stili originali */
 body {
-  margin: 0;
+  background-color: #ffffff;
+  color: #000000;
   font-family: Arial, sans-serif;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  transition: background-color 0.3s, color 0.3s;
+  margin: 0;
+  padding: 0;
 }
 
 button {
-  background-color: var(--primary-color);
-  color: var(--text-color);
+  background-color: #1e88e5;
+  color: #ffffff;
   border: none;
   padding: 10px 15px;
   border-radius: 5px;
@@ -26,7 +18,7 @@ button {
 }
 
 button:hover {
-  background-color: var(--hover-color);
+  background-color: #1a73e8;
 }
 
 .container {
@@ -35,22 +27,20 @@ button:hover {
   padding: 20px;
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+/* Stili per tabelle */
+.interactive-table th {
+  background-color: #f3f4f6;
+  color: #333;
 }
 
-.table th, .table td {
-  border: 1px solid var(--border-color);
-  padding: 10px;
-  text-align: left;
+.interactive-table tr:nth-child(even) {
+  background-color: #f9f9f9;
 }
 
-.table th {
-  background-color: var(--secondary-color);
+.interactive-table tr:hover {
+  background-color: #f1f1f1;
 }
 
-.table tr:hover {
-  background-color: var(--secondary-color);
+.interactive-table td {
+  color: #555;
 }

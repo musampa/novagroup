@@ -46,6 +46,11 @@ def get_dipendenti():
                     "$match": query  # Filtra i dipendenti in base ai parametri (es. divisione)
                 },
                 {
+                    "$addFields": {
+                        "filiale_id": {"$toInt": "$filiale_id"}  # Converte filiale_id in numero
+                    }
+                },
+                {
                     "$lookup": {
                         "from": "filiali",  # Nome della collezione 'filiali'
                         "localField": "filiale_id",  # Campo in 'dipendenti' che collega le due collezioni
@@ -62,6 +67,8 @@ def get_dipendenti():
             ])
         )
 
+        print("Dipendenti trovati dopo il lookup:", dipendenti)
+
         # Prepara la risposta JSON
         response = [
             {
@@ -71,7 +78,7 @@ def get_dipendenti():
                 "mansione": dipendente.get("mansione"),
                 "divisione": dipendente.get("divisione"),
                 "filiale_id": dipendente.get("filiale_id"),
-                "filiale_nome": dipendente.get("filiale_info", {}).get("filiale_cantiere", "Sconosciuta")  # Recupera il nome della filiale o "Sconosciuta" se manca
+                "filiale_nome": dipendente.get("filiale_info", {}).get("filiale_nome", "Sconosciuta")
             }
             for dipendente in dipendenti
         ]

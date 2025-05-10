@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTable, useFilters, useSortBy } from "react-table";
 import "./DipendentiLogi.css"; // Assicurati che il file CSS sia presente
+import EmployeeTable from "../components/EmployeeTable";
 
 // Componente per il filtro nella colonna
 function DefaultColumnFilter({
@@ -34,6 +35,7 @@ export default function DipendentiLogi() {
           throw new Error(`Errore durante il recupero dei dipendenti: ${response.status}`);
         }
         const data = await response.json();
+        console.log("Dati ricevuti dal backend:", data);
         setDipendenti(data || []); // Imposta un array vuoto per prevenire errori
       } catch (err) {
         console.error("Errore durante la chiamata API:", err.message);
@@ -46,61 +48,19 @@ export default function DipendentiLogi() {
     fetchDipendenti();
   }, []);
 
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: "ID",
-        accessor: "id",
-        disableFilters: true, // Disabilita il filtro per questa colonna
-      },
-      {
-        Header: "Nome",
-        accessor: "nome",
-        disableFilters: true, // Disabilita il filtro per questa colonna
-      },
-      {
-        Header: "Cognome",
-        accessor: "cognome",
-        Filter: DefaultColumnFilter, // Aggiungi il filtro personalizzato
-      },
-      {
-        Header: "Mansione",
-        accessor: "mansione",
-        disableFilters: true, // Disabilita il filtro per questa colonna
-      },
-      {
-        Header: "Filiale",
-        accessor: "filiale_nome",
-        Filter: DefaultColumnFilter, // Aggiungi il filtro personalizzato
-      },
-    ],
-    []
-  );
+  useEffect(() => {
+    console.log("Dipendenti LOGI:", dipendenti);
+  }, [dipendenti]);
 
-  const data = React.useMemo(() => dipendenti, [dipendenti]);
+  const handleEdit = (dipendente) => {
+    console.log("Modifica dipendente:", dipendente);
+    // Implementa la logica di modifica qui
+  };
 
-  const defaultColumn = React.useMemo(
-    () => ({
-      Filter: DefaultColumnFilter, // Imposta un filtro di default
-    }),
-    []
-  );
-
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable(
-    {
-      columns,
-      data,
-      defaultColumn, // Aggiungi la colonna di default con il filtro
-    },
-    useFilters, // Abilita i filtri
-    useSortBy // Abilita l'ordinamento
-  );
+  const handleDelete = (id) => {
+    console.log("Elimina dipendente con ID:", id);
+    // Implementa la logica di eliminazione qui
+  };
 
   if (loading) {
     return <p>Caricamento in corso...</p>;
@@ -110,36 +70,35 @@ export default function DipendentiLogi() {
     return <p>Errore: {error}</p>;
   }
 
+  console.log("Dipendenti trovati:", dipendenti);
+
   return (
     <div className="table-container">
       <h1>Lista Dipendenti LOGI</h1>
       {dipendenti.length === 0 ? (
         <p>Nessun dipendente trovato.</p>
       ) : (
-        <table {...getTableProps()} className="interactive-table">
+        <table>
           <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                    {column.render("Header")}
-                    <div>{column.canFilter ? column.render("Filter") : null}</div>
-                  </th>
-                ))}
+            <tr>
+              <th>Nome</th>
+              <th>Cognome</th>
+              <th>Filiale</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dipendenti.map((employee) => (
+              <tr key={employee.id}>
+                <td>{employee.nome}</td>
+                <td>{employee.cognome}</td>
+                <td>{employee.filiale_nome || "Sconosciuta"}</td>
+                <td>
+                  <button onClick={() => handleEdit(employee)}>Modifica</button>
+                  <button onClick={() => handleDelete(employee.id)}>Elimina</button>
+                </td>
               </tr>
             ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {rows.map((row) => {
-              prepareRow(row);
-              return (
-                <tr {...row.getRowProps()}>
-                  {row.cells.map((cell) => (
-                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                  ))}
-                </tr>
-              );
-            })}
           </tbody>
         </table>
       )}

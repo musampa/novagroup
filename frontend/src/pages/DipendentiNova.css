@@ -15,6 +15,7 @@
     text-align: left;
   }
   
+  /* Ripristinati gli stili originali per le tabelle */
   .interactive-table th {
     background-color: #f3f4f6;
     color: #333;
@@ -38,3 +39,5 @@
   .interactive-table td {
     color: #555;
   }
+
+/* Removed invalid HTML content from CSS file */
