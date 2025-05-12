@@ -1,40 +1,25 @@
 from flask import Blueprint, request, jsonify
+from database import db
 from bson.objectid import ObjectId
 
-filiali_blueprint = Blueprint("filiali", __name__)
+filiali_blueprint = Blueprint('filiali_routes', __name__)
 
-# MongoDB collection
-def get_collection():
-    from app import mongo
-    return mongo.db.filiali
-
-
-@filiali_blueprint.route("/", methods=["GET"])
+@filiali_blueprint.route('/', methods=['GET'])
 def get_filiali():
+    divisione = request.args.get('divisione')
+
+    if not divisione:
+        return jsonify({"error": "Divisione non specificata"}), 400
+
     try:
-        # Ottieni il parametro 'divisione' dalla query string
-        divisione = request.args.get("divisione")
-        query = {}
+        # Determina la collection corretta in base alla divisione
+        collection_name = f"filiali_{divisione}"
+        filiali_collection = db[collection_name]
 
-        # Filtra per divisione se specificato
-        if divisione:
-            query["divisione"] = divisione
+        # Recupera tutte le filiali dalla collection
+        filiali = list(filiali_collection.find({}, {"_id": 0}))
 
-        # Recupera le filiali dal database
-        filiali = list(get_collection().find(query))
-        response = [
-            {
-                "id": str(filiale["_id"]),
-                "filiale_id": filiale.get("filiale_id"),
-                "filiale_nome": filiale.get("filiale_nome"),
-                "filiale_indirizzo": filiale.get("filiale_indirizzo"),
-                "filiale_citta": filiale.get("filiale_citta"),
-                "divisione": filiale.get("divisione"),
-            }
-            for filiale in filiali
-        ]
-
-        return jsonify(response), 200
+        return jsonify(filiali), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -42,11 +27,10 @@ def get_filiali():
 def get_filiali_by_collection(collezione):
     try:
         # Determina la collezione da utilizzare
-        from app import mongo
         if collezione == "nova":
-            collection = mongo.db.filiali_nova
+            collection = db.filiali_nova
         elif collezione == "logi":
-            collection = mongo.db.filiali_logi
+            collection = db.filiali_logi
         else:
             return jsonify({"error": "Collezione non valida"}), 400
 
@@ -71,11 +55,10 @@ def get_filiali_by_collection(collezione):
 def create_filiale(collezione):
     try:
         # Determina la collezione da utilizzare
-        from app import mongo
         if collezione == "nova":
-            collection = mongo.db.filiali_nova
+            collection = db.filiali_nova
         elif collezione == "logi":
-            collection = mongo.db.filiali_logi
+            collection = db.filiali_logi
         else:
             return jsonify({"error": "Collezione non valida"}), 400
 
@@ -90,19 +73,17 @@ def create_filiale(collezione):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Aggiorna una filiale
 @filiali_blueprint.route("/<id>", methods=["PUT"])
 def update_filiale(id):
     data = request.get_json()
-    result = get_collection().update_one({"_id": ObjectId(id)}, {"$set": data})
+    result = db.filiali.update_one({"_id": ObjectId(id)}, {"$set": data})
     if result.matched_count:
         return jsonify({"message": "Filiale aggiornata"}), 200
     return jsonify({"error": "Filiale non trovata"}), 404
 
-# Elimina una filiale
 @filiali_blueprint.route("/<id>", methods=["DELETE"])
 def delete_filiale(id):
-    result = get_collection().delete_one({"_id": ObjectId(id)})
+    result = db.filiali.delete_one({"_id": ObjectId(id)})
     if result.deleted_count:
         return jsonify({"message": "Filiale eliminata"}), 200
     return jsonify({"error": "Filiale non trovata"}), 404

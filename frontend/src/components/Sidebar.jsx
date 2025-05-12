@@ -32,20 +32,16 @@ export default function Sidebar({ onMenuSelect }) {
             ],
           },
           {
-            title: "Vestiario",
-            itemId: "/vestiario",
-            subNav: [
-              { title: "Inserisci Vestiario", itemId: "/vestiario/inserisci" },
-            ],
-          },
-          {
             title: "Magazzino",
             itemId: "/magazzino",
             subNav: [
-              { title: "Visualizza Vestiario NOVA", itemId: "/magazzino/vestiario/nova" },
-              { title: "Visualizza Vestiario LOGI", itemId: "/magazzino/vestiario/logi" },
+              { title: "Magazzino Logi", itemId: "/magazzino/logi" },
+              { title: "Magazzino Nova", itemId: "/magazzino/nova" },
+              { title: "Inserisci Vestiario", itemId: "/magazzino/inserisci" },
               { title: "Assegna Vestiario", itemId: "/magazzino/assegna" },
+              { title: "Vestiario Assegnato", itemId: "/magazzino/vestiario-assegnato" },
             ],
+            action: "openSubmenuOnly", // Aggiunto per evitare di mostrare dati
           },
           {
             title: "Mezzi",

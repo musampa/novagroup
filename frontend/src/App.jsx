@@ -8,10 +8,14 @@ import Login from "./pages/Login";
 import DipendentiNova from "./pages/DipendentiNova";
 import DipendentiLogi from "./pages/DipendentiLogi";
 import CreaDipendente from "./pages/CreaDipendente";
-import InsertVestiario from "./pages/InsertVestiario";
 import FilialiNova from "./pages/FilialiNova";
 import FilialiLogi from "./pages/FilialiLogi";
 import CreaFiliale from "./pages/CreaFiliale";
+import InserisciVestiario from "./pages/InserisciVestiario";
+import Magazzino from "./pages/Magazzino";
+import MagazzinoLogi from "./pages/MagazzinoLogi";
+import MagazzinoNova from "./pages/MagazzinoNova";
+import AssegnaVestiario from "./pages/AssegnaVestiario";
 import "./styles/global.css";
 
 export default function App() {
@@ -51,10 +55,14 @@ export default function App() {
                 <Route path="/dipendenti/nova" element={<DipendentiNova />} />
                 <Route path="/dipendenti/logi" element={<DipendentiLogi />} />
                 <Route path="/dipendenti/crea" element={<CreaDipendente />} />
-                <Route path="/vestiario/inserisci" element={<InsertVestiario />} />
                 <Route path="/filiali/nova" element={<FilialiNova />} />
                 <Route path="/filiali/logi" element={<FilialiLogi />} />
                 <Route path="/filiali/crea" element={<CreaFiliale onCreate={(newFiliale) => console.log('Filiale creata:', newFiliale)} />} />
+                <Route path="/magazzino" element={<Magazzino />} />
+                <Route path="/magazzino/logi" element={<MagazzinoLogi />} />
+                <Route path="/magazzino/nova" element={<MagazzinoNova />} />
+                <Route path="/magazzino/inserisci" element={<InserisciVestiario />} />
+                <Route path="/magazzino/assegna" element={<AssegnaVestiario />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
               </>
             ) : (
