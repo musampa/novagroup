@@ -9,6 +9,9 @@ import DipendentiNova from "./pages/DipendentiNova";
 import DipendentiLogi from "./pages/DipendentiLogi";
 import CreaDipendente from "./pages/CreaDipendente";
 import InsertVestiario from "./pages/InsertVestiario";
+import FilialiNova from "./pages/FilialiNova";
+import FilialiLogi from "./pages/FilialiLogi";
+import CreaFiliale from "./pages/CreaFiliale";
 import "./styles/global.css";
 
 export default function App() {
@@ -49,6 +52,9 @@ export default function App() {
                 <Route path="/dipendenti/logi" element={<DipendentiLogi />} />
                 <Route path="/dipendenti/crea" element={<CreaDipendente />} />
                 <Route path="/vestiario/inserisci" element={<InsertVestiario />} />
+                <Route path="/filiali/nova" element={<FilialiNova />} />
+                <Route path="/filiali/logi" element={<FilialiLogi />} />
+                <Route path="/filiali/crea" element={<CreaFiliale onCreate={(newFiliale) => console.log('Filiale creata:', newFiliale)} />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
               </>
             ) : (

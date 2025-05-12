@@ -64,6 +64,7 @@ def get_dipendenti():
                         "preserveNullAndEmptyArrays": True  # Mantieni il documento anche se non c'è una corrispondenza
                     }
                 }
+                
             ])
         )
 
