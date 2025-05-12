@@ -183,11 +183,17 @@ def get_disponibilita_magazzino():
     except Exception as e:
         return {"error": str(e)}, 500
 
-@magazzino_blueprint.route('/vestiario-assegnato', methods=['GET'])
+@magazzino_blueprint.route('/vestiario_assegnato', methods=['GET'])
 def get_vestiario_assegnato():
     try:
         # Recupera tutte le assegnazioni dalla collezione `vestiario_assegnato`
         assegnazioni = list(mongo.db.vestiario_assegnato.find({}, {"_id": 0}))
+
+        # Formatta le date come stringhe ISO 8601
+        for assegnazione in assegnazioni:
+            if "dataAssegnazione" in assegnazione:
+                assegnazione["dataAssegnazione"] = assegnazione["dataAssegnazione"].isoformat() if isinstance(assegnazione["dataAssegnazione"], datetime) else assegnazione["dataAssegnazione"]
+
         return dumps(assegnazioni), 200
     except Exception as e:
         print("Errore durante il recupero delle assegnazioni:", str(e))  # Log per debug

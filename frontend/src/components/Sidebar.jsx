@@ -39,7 +39,7 @@ export default function Sidebar({ onMenuSelect }) {
               { title: "Magazzino Nova", itemId: "/magazzino/nova" },
               { title: "Inserisci Vestiario", itemId: "/magazzino/inserisci" },
               { title: "Assegna Vestiario", itemId: "/magazzino/assegna" },
-              { title: "Vestiario Assegnato", itemId: "/magazzino/vestiario-assegnato" },
+              { title: "Vestiario Assegnato", itemId: "/magazzino/vestiario_assegnato" },
             ],
             action: "openSubmenuOnly", // Aggiunto per evitare di mostrare dati
           },

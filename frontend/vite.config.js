@@ -11,6 +11,7 @@ export default defineConfig({
         secure: false,
       },
     },
+    historyApiFallback: true, // Aggiunto per gestire il fallback del routing lato client
   },
 
   plugins: [react()],

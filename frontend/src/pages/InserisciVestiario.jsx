@@ -4,7 +4,7 @@ export default function InserisciVestiario() {
   const [formData, setFormData] = useState([{ tipo: "", taglia: "", quantita: 1, divisione: "" }]);
 
   const categorie = [
-    "Giaccone", "Felpa", "Maglia", "Pantaloni", "Scarpe", "Fratino", "Bretelle", "Portabadge"
+    "Giaccone", "Felpa", "Maglia", "Pantaloni", "Scarpe", "Fratino", "Bretelle", "Portabadge", "Guanti"
   ];
 
   const taglie = {
@@ -16,6 +16,7 @@ export default function InserisciVestiario() {
     Fratino: ["Taglia unica"],
     Bretelle: ["Taglia unica"],
     Portabadge: ["Taglia unica"],
+    Guanti: ["8", "9", "10"]
   };
 
   const handleChange = (index, e) => {

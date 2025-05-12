@@ -10,7 +10,7 @@ export default function AssegnazioniVestiario() {
 
   const fetchAssegnazioni = async () => {
     try {
-      const response = await fetch("/api/assegnazioni");
+      const response = await fetch("/vestiario_assegnato");
       if (!response.ok) throw new Error("Errore durante il recupero delle assegnazioni");
       const data = await response.json();
       setAssegnazioni(data);

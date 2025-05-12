@@ -16,7 +16,9 @@ import Magazzino from "./pages/Magazzino";
 import MagazzinoLogi from "./pages/MagazzinoLogi";
 import MagazzinoNova from "./pages/MagazzinoNova";
 import AssegnaVestiario from "./pages/AssegnaVestiario";
+import VestiarioAssegnato from "./pages/Magazzino/VestiarioAssegnato";
 import "./styles/global.css";
+import './styles/Login.css';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Stato di login
@@ -44,11 +46,14 @@ export default function App() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      <Header userName={isLoggedIn ? userName : null} onLogout={handleLogout} />
+      {isLoggedIn && <Header userName={userName} onLogout={handleLogout} />}
       <div style={{ display: "flex", flexGrow: 1 }}>
         {isLoggedIn && <Sidebar onMenuSelect={handleMenuSelect} />}
         <div style={{ flexGrow: 1, padding: "20px" }}>
           <Routes>
+            {console.log("Rendering Routes. isLoggedIn:", isLoggedIn)}
+            {console.log("Navigating to /login or /dashboard based on isLoggedIn state.")}
+            {console.log("Current location:", window.location.pathname)}
             {isLoggedIn ? (
               <>
                 <Route path="/dashboard" element={<Dashboard />} />
@@ -63,18 +68,20 @@ export default function App() {
                 <Route path="/magazzino/nova" element={<MagazzinoNova />} />
                 <Route path="/magazzino/inserisci" element={<InserisciVestiario />} />
                 <Route path="/magazzino/assegna" element={<AssegnaVestiario />} />
+                <Route path="/magazzino/vestiario_assegnato" element={<VestiarioAssegnato />} />
+                <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
               </>
             ) : (
               <>
+                <Route path="/" element={<Login onLogin={handleLogin} />} />
                 <Route path="/login" element={<Login onLogin={handleLogin} />} />
-                <Route path="*" element={<Navigate to="/login" />} />
               </>
             )}
           </Routes>
         </div>
       </div>
-      <Footer />
+      {isLoggedIn && <Footer />}
     </div>
   );
 }
