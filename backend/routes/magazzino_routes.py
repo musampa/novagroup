@@ -29,6 +29,14 @@ def inserisci_magazzino():
         if not dati:
             return {"message": "Dati mancanti"}, 400
 
+        # Verifica e converte il campo 'quantita' in un intero
+        for record in dati:
+            if "quantita" in record:
+                try:
+                    record["quantita"] = int(record["quantita"])
+                except (ValueError, TypeError):
+                    return {"message": "Errore: il campo 'quantita' deve essere un numero valido."}, 400
+
         # Aggiunge il campo dataInserimento a ogni elemento
         for elemento in dati:
             elemento['dataInserimento'] = datetime.utcnow()
@@ -115,6 +123,12 @@ def assegna_vestiario():
                 try:
                     documento["quantita"] = int(documento["quantita"])
                     print("Convertito 'quantita' in intero:", documento["quantita"])  # Log per debug
+                    # Aggiorna il campo 'quantita' nel database se necessario
+                    magazzino.update_one(
+                        {"_id": documento["_id"]},
+                        {"$set": {"quantita": documento["quantita"]}}
+                    )
+                    print("Campo 'quantita' aggiornato nel database.")
                 except ValueError:
                     print("Errore: impossibile convertire 'quantita' in intero. Valore:", documento["quantita"])  # Log per debug
                     return {"message": "Errore: il campo 'quantita' nel database non è numerico e non può essere convertito"}, 500
