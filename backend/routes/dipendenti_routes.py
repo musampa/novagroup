@@ -33,42 +33,19 @@ def get_dipendenti():
     try:
         # Ottieni il parametro 'divisione' dalla query string
         divisione = request.args.get("divisione")
-        query = {}
 
-        # Filtra per divisione se specificato
-        if divisione:
-            query["divisione"] = divisione
+        from app import mongo
 
-        # Usa un'aggregazione per unire i dati della collezione 'filiali'
-        dipendenti = list(
-            get_collection().aggregate([
-                {
-                    "$match": query  # Filtra i dipendenti in base ai parametri (es. divisione)
-                },
-                {
-                    "$addFields": {
-                        "filiale_id": {"$toInt": "$filiale_id"}  # Converte filiale_id in numero
-                    }
-                },
-                {
-                    "$lookup": {
-                        "from": "filiali",  # Nome della collezione 'filiali'
-                        "localField": "filiale_id",  # Campo in 'dipendenti' che collega le due collezioni
-                        "foreignField": "filiale_id",  # Campo in 'filiali' da unire
-                        "as": "filiale_info"  # Nome del campo per le informazioni sulla filiale
-                    }
-                },
-                {
-                    "$unwind": {  # Scompatta l'array 'filiale_info'
-                        "path": "$filiale_info",
-                        "preserveNullAndEmptyArrays": True  # Mantieni il documento anche se non c'è una corrispondenza
-                    }
-                }
-                
-            ])
-        )
+        # Seleziona la collezione appropriata in base alla divisione
+        if divisione == "logi":
+            collection = mongo.db.dipendenti_logi
+        elif divisione == "nova":
+            collection = mongo.db.dipendenti_nova
+        else:
+            return jsonify({"error": "Divisione non valida"}), 400
 
-        print("Dipendenti trovati dopo il lookup:", dipendenti)
+        # Recupera i dati direttamente dalla collezione
+        dipendenti = list(collection.find({}, {"_id": 1, "cognome": 1, "nome": 1, "mansione": 1, "divisione": 1, "filiale_nome": 1}))
 
         # Prepara la risposta JSON
         response = [
@@ -78,13 +55,12 @@ def get_dipendenti():
                 "nome": dipendente.get("nome"),
                 "mansione": dipendente.get("mansione"),
                 "divisione": dipendente.get("divisione"),
-                "filiale_id": dipendente.get("filiale_id"),
-                "filiale_nome": dipendente.get("filiale_info", {}).get("filiale_nome", "Sconosciuta")
+                "filiale_nome": dipendente.get("filiale_nome", "Sconosciuta")
             }
             for dipendente in dipendenti
         ]
 
-        return jsonify(response), 200  # Restituisci una risposta valida con codice HTTP 200
+        return jsonify(response), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500  # Gestisci eventuali errori
     

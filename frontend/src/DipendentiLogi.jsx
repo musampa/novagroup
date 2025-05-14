@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { DataTable } from 'mantine-datatable';
-import "./DipendentiNova.css"; // Assicurati che il file CSS sia presente
+import "./DipendentiLogi.css"; // Assicurati che il file CSS sia presente
 
-export default function DipendentiNova() {
+export default function DipendentiLogi() {
   const [dipendenti, setDipendenti] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,7 +10,7 @@ export default function DipendentiNova() {
   useEffect(() => {
     const fetchDipendenti = async () => {
       try {
-        const response = await fetch("/api/dipendenti?divisione=nova");
+        const response = await fetch("/api/dipendenti?divisione=logi");
         if (!response.ok) {
           throw new Error(`Errore durante il recupero dei dipendenti: ${response.status}`);
         }
@@ -27,6 +27,10 @@ export default function DipendentiNova() {
     fetchDipendenti();
   }, []);
 
+  useEffect(() => {
+    console.log("Dati dipendenti ricevuti:", dipendenti);
+  }, [dipendenti]);
+
   if (loading) {
     return <p>Caricamento in corso...</p>;
   }
@@ -36,9 +40,12 @@ export default function DipendentiNova() {
   }
 
   return (
-    <div className="table-container">
-      <h1>Lista Dipendenti NOVA</h1>
+    <div className="table-container" style={{ border: '2px solid blue', padding: '20px', backgroundColor: '#f9f9f9 !important', minHeight: '200px' }}>
+      <h1>Lista Dipendenti LOGI</h1>
+      {console.log("Rendering DataTable con records:", dipendenti)}
+      {console.log("Dati passati a DataTable:", dipendenti)}
       <DataTable
+        style={{ display: 'block', width: '100%', border: '1px solid #ddd', backgroundColor: '#fff' }}
         withBorder
         withColumnBorders
         striped
@@ -52,6 +59,7 @@ export default function DipendentiNova() {
           { accessor: 'filiale_nome', title: 'Filiale' },
         ]}
       />
+      {dipendenti.length === 0 && <p>Nessun dato disponibile per la tabella.</p>}
     </div>
   );
 }

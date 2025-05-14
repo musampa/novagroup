@@ -1,0 +1,39 @@
+/* Stili personalizzati per la tabella Mantine nella pagina DipendentiLogi */
+
+.table-container {
+  margin: 20px;
+  padding: 20px;
+  border: 2px solid blue;
+  background-color: #f9f9f9;
+  min-height: 200px;
+}
+
+.mantine-DataTable {
+  width: 100%;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-collapse: collapse;
+}
+
+.mantine-DataTable th {
+  background-color: #f3f4f6;
+  color: #333;
+  font-weight: bold;
+  text-align: left;
+  padding: 10px;
+}
+
+.mantine-DataTable td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  color: #555;
+}
+
+.mantine-DataTable tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.mantine-DataTable tr:hover {
+  background-color: #f1f1f1;
+}
+

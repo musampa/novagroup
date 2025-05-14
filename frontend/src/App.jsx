@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { MantineProvider } from '@mantine/core';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
@@ -45,43 +46,45 @@ export default function App() {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      {isLoggedIn && <Header userName={userName} onLogout={handleLogout} />}
-      <div style={{ display: "flex", flexGrow: 1 }}>
-        {isLoggedIn && <Sidebar onMenuSelect={handleMenuSelect} />}
-        <div style={{ flexGrow: 1, padding: "20px" }}>
-          <Routes>
-            {console.log("Rendering Routes. isLoggedIn:", isLoggedIn)}
-            {console.log("Navigating to /login or /dashboard based on isLoggedIn state.")}
-            {console.log("Current location:", window.location.pathname)}
-            {isLoggedIn ? (
-              <>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/dipendenti/nova" element={<DipendentiNova />} />
-                <Route path="/dipendenti/logi" element={<DipendentiLogi />} />
-                <Route path="/dipendenti/crea" element={<CreaDipendente />} />
-                <Route path="/filiali/nova" element={<FilialiNova />} />
-                <Route path="/filiali/logi" element={<FilialiLogi />} />
-                <Route path="/filiali/crea" element={<CreaFiliale onCreate={(newFiliale) => console.log('Filiale creata:', newFiliale)} />} />
-                <Route path="/magazzino" element={<Magazzino />} />
-                <Route path="/magazzino/logi" element={<MagazzinoLogi />} />
-                <Route path="/magazzino/nova" element={<MagazzinoNova />} />
-                <Route path="/magazzino/inserisci" element={<InserisciVestiario />} />
-                <Route path="/magazzino/assegna" element={<AssegnaVestiario />} />
-                <Route path="/magazzino/vestiario_assegnato" element={<VestiarioAssegnato />} />
-                <Route path="/" element={<Navigate to="/login" replace />} />
-                <Route path="*" element={<Navigate to="/dashboard" />} />
-              </>
-            ) : (
-              <>
-                <Route path="/" element={<Login onLogin={handleLogin} />} />
-                <Route path="/login" element={<Login onLogin={handleLogin} />} />
-              </>
-            )}
-          </Routes>
+    <MantineProvider withGlobalStyles withNormalizeCSS>
+      <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+        {isLoggedIn && <Header userName={userName} onLogout={handleLogout} />}
+        <div style={{ display: "flex", flexGrow: 1 }}>
+          {isLoggedIn && <Sidebar onMenuSelect={handleMenuSelect} />}
+          <div style={{ flexGrow: 1, padding: "20px" }}>
+            <Routes>
+              {console.log("Rendering Routes. isLoggedIn:", isLoggedIn)}
+              {console.log("Navigating to /login or /dashboard based on isLoggedIn state.")}
+              {console.log("Current location:", window.location.pathname)}
+              {isLoggedIn ? (
+                <>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/dipendenti/nova" element={<DipendentiNova />} />
+                  <Route path="/dipendenti/logi" element={<DipendentiLogi />} />
+                  <Route path="/dipendenti/crea" element={<CreaDipendente />} />
+                  <Route path="/filiali/nova" element={<FilialiNova />} />
+                  <Route path="/filiali/logi" element={<FilialiLogi />} />
+                  <Route path="/filiali/crea" element={<CreaFiliale onCreate={(newFiliale) => console.log('Filiale creata:', newFiliale)} />} />
+                  <Route path="/magazzino" element={<Magazzino />} />
+                  <Route path="/magazzino/logi" element={<MagazzinoLogi />} />
+                  <Route path="/magazzino/nova" element={<MagazzinoNova />} />
+                  <Route path="/magazzino/inserisci" element={<InserisciVestiario />} />
+                  <Route path="/magazzino/assegna" element={<AssegnaVestiario />} />
+                  <Route path="/magazzino/vestiario_assegnato" element={<VestiarioAssegnato />} />
+                  <Route path="/" element={<Navigate to="/login" replace />} />
+                  <Route path="*" element={<Navigate to="/dashboard" />} />
+                </>
+              ) : (
+                <>
+                  <Route path="/" element={<Login onLogin={handleLogin} />} />
+                  <Route path="/login" element={<Login onLogin={handleLogin} />} />
+                </>
+              )}
+            </Routes>
+          </div>
         </div>
+        {isLoggedIn && <Footer />}
       </div>
-      {isLoggedIn && <Footer />}
-    </div>
+    </MantineProvider>
   );
 }
