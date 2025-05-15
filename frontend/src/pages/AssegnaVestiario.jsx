@@ -1,4 +1,10 @@
 import React, { useState, useEffect } from "react";
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Button from '@mui/material/Button';
 
 export default function AssegnaVestiario() {
   const [formData, setFormData] = useState({
@@ -123,93 +129,101 @@ export default function AssegnaVestiario() {
   };
 
   return (
-    <div className="assegna-vestiario-container">
-      <h1>Assegna Vestiario</h1>
-      {successMessage && <p className="success-message">{successMessage}</p>}
-      {errorMessage && <p className="error-message">{errorMessage}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="divisione">Divisione:</label>
-          <select
-            id="divisione"
+    <div className="form-wrapper">
+      <h2 style={{ textTransform: 'uppercase', fontSize: 32, letterSpacing: 1, fontWeight: 700, color: '#fff', marginBottom: 24, textAlign: 'center' }}>Assegna Vestiario</h2>
+      {successMessage && <p className="success-message" style={{ color: 'limegreen', textAlign: 'center' }}>{successMessage}</p>}
+      {errorMessage && <p className="error-message" style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</p>}
+      <form onSubmit={handleSubmit} className="form-creation" style={{ background: '#232526', borderRadius: 12, padding: 24, boxShadow: '0 2px 16px #0002', color: '#fff', maxWidth: 420, margin: '0 auto', border: 'none' }}>
+        <FormControl variant="standard" fullWidth sx={{ mb: 2 }}>
+          <InputLabel shrink style={{ color: '#51cbce' }}>Divisione</InputLabel>
+          <Select
             name="divisione"
             value={formData.divisione}
             onChange={handleChange}
             required
+            sx={{ color: '#fff', '.MuiSelect-icon': { color: '#51cbce' } }}
+            label="Divisione"
+            displayEmpty
           >
-            <option value="">Seleziona Divisione</option>
-            <option value="logi">Logi</option>
-            <option value="nova">Nova</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="filiale">Filiale:</label>
-          <select
-            id="filiale"
+            <MenuItem value=""><em>Seleziona...</em></MenuItem>
+            <MenuItem value="logi">Logi</MenuItem>
+            <MenuItem value="nova">Nova</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl variant="standard" fullWidth sx={{ mb: 2 }}>
+          <InputLabel shrink style={{ color: '#51cbce' }}>Filiale</InputLabel>
+          <Select
             name="filiale"
             value={formData.filiale}
             onChange={handleChange}
             required
+            sx={{ color: '#fff', '.MuiSelect-icon': { color: '#51cbce' } }}
+            label="Filiale"
+            displayEmpty
+            disabled={!formData.divisione}
           >
-            <option value="">Seleziona Filiale</option>
+            <MenuItem value=""><em>Seleziona...</em></MenuItem>
             {filiali.map((filiale) => (
-              <option key={filiale.id} value={filiale.id}>
+              <MenuItem key={filiale.id} value={filiale.id}>
                 {filiale.filiale_nome}
-              </option>
+              </MenuItem>
             ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="tipo">Tipo:</label>
-          <select
-            id="tipo"
+          </Select>
+        </FormControl>
+        <FormControl variant="standard" fullWidth sx={{ mb: 2 }}>
+          <InputLabel shrink style={{ color: '#51cbce' }}>Tipo</InputLabel>
+          <Select
             name="tipo"
             value={formData.tipo}
             onChange={handleChange}
             required
+            sx={{ color: '#fff', '.MuiSelect-icon': { color: '#51cbce' } }}
+            label="Tipo"
+            displayEmpty
+            disabled={!formData.divisione}
           >
-            <option value="">Seleziona Tipo</option>
+            <MenuItem value=""><em>Seleziona...</em></MenuItem>
             {tipiDisponibili.map((tipo) => (
-              <option key={tipo} value={tipo}>
-                {tipo}
-              </option>
+              <MenuItem key={tipo} value={tipo}>{tipo}</MenuItem>
             ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="taglia">Taglia:</label>
-          <select
-            id="taglia"
+          </Select>
+        </FormControl>
+        <FormControl variant="standard" fullWidth sx={{ mb: 2 }}>
+          <InputLabel shrink style={{ color: '#51cbce' }}>Taglia</InputLabel>
+          <Select
             name="taglia"
             value={formData.taglia}
             onChange={handleChange}
             required
+            sx={{ color: '#fff', '.MuiSelect-icon': { color: '#51cbce' } }}
+            label="Taglia"
+            displayEmpty
+            disabled={!formData.tipo}
           >
-            <option value="">Seleziona Taglia</option>
+            <MenuItem value=""><em>Seleziona...</em></MenuItem>
             {taglieDisponibili.map((taglia) => (
-              <option key={taglia} value={taglia}>
-                {taglia}
-              </option>
+              <MenuItem key={taglia} value={taglia}>{taglia}</MenuItem>
             ))}
-          </select>
+          </Select>
+        </FormControl>
+        <TextField
+          label="Quantità"
+          name="quantita"
+          type="number"
+          value={formData.quantita}
+          onChange={handleChange}
+          required
+          variant="standard"
+          InputLabelProps={{ shrink: true }}
+          sx={{ mb: 2, input: { color: '#fff' }, label: { color: '#51cbce' } }}
+          inputProps={{ min: 1, max: quantitaDisponibili.reduce((acc, curr) => acc + curr, 0) }}
+        />
+        <div style={{ color: '#51cbce', marginBottom: 12, fontSize: 15 }}>
+          Disponibilità residua: {quantitaDisponibili.reduce((acc, curr) => acc + curr, 0)}
         </div>
-        <div>
-          <label htmlFor="quantita">Quantità:</label>
-          <input
-            type="number"
-            id="quantita"
-            name="quantita"
-            value={formData.quantita}
-            onChange={handleChange}
-            min="1"
-            max={quantitaDisponibili.reduce((acc, curr) => acc + curr, 0)}
-            required
-          />
-          <span>
-            Disponibilità residua: {quantitaDisponibili.reduce((acc, curr) => acc + curr, 0)}
-          </span>
-        </div>
-        <button type="submit">Assegna</button>
+        <Button type="submit" variant="contained" style={{ background: '#51cbce', color: '#fff', borderRadius: 6, fontWeight: 600, fontSize: 16, marginTop: 8, width: '100%' }}>
+          Assegna
+        </Button>
       </form>
     </div>
   );

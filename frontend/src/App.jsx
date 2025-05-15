@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { MantineProvider } from '@mantine/core';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import Sidebar from "./components/Sidebar";
+import SidebarLBD from "./components/SidebarLBD";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import DipendentiNova from "./pages/DipendentiNova";
@@ -47,11 +47,34 @@ export default function App() {
 
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
-      <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        minHeight: '100vh',
+        background: isLoggedIn
+          ? 'linear-gradient(to bottom, #f7fafc 0%, #e3e6ec 100%)'
+          : 'linear-gradient(120deg, #e0e0e0 0%, #d3eaff 100%)',
+        transition: 'background 0.3s',
+      }}>
         {isLoggedIn && <Header userName={userName} onLogout={handleLogout} />}
         <div style={{ display: "flex", flexGrow: 1 }}>
-          {isLoggedIn && <Sidebar onMenuSelect={handleMenuSelect} />}
-          <div style={{ flexGrow: 1, padding: "20px" }}>
+          {isLoggedIn && (
+            <SidebarLBD active={window.location.pathname} onMenuSelect={handleMenuSelect} />
+          )}
+          <div style={{
+            flexGrow: 1,
+            padding: "32px 24px 24px 24px",
+            borderRadius: 24,
+            margin: 24,
+            background: isLoggedIn ? 'linear-gradient(180deg, #fafdff 0%, #e9eef3 100%)' : 'transparent',
+            boxShadow: isLoggedIn ? '0 4px 32px #b0b8c320' : 'none',
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            transition: 'background 0.3s',
+          }}>
             <Routes>
               {console.log("Rendering Routes. isLoggedIn:", isLoggedIn)}
               {console.log("Navigating to /login or /dashboard based on isLoggedIn state.")}
