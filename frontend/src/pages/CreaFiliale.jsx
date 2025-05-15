@@ -2,7 +2,6 @@ import React, { useState } from "react";
 
 export default function CreaFiliale({ onCreate }) {
   const [formData, setFormData] = useState({
-    filiale_id: "",
     filiale_nome: "",
     filiale_indirizzo: "",
     filiale_citta: "",
@@ -16,17 +15,19 @@ export default function CreaFiliale({ onCreate }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/filiali/nova`, {
+      const endpoint = `/api/filiali/${formData.divisione}`;
+      const { divisione, ...dataToSend } = formData;
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend),
       });
       if (!response.ok) {
         throw new Error("Errore durante la creazione della filiale");
       }
       const newFiliale = await response.json();
       onCreate(newFiliale);
-      setFormData({ filiale_id: "", filiale_nome: "", filiale_indirizzo: "", filiale_citta: "" });
+      setFormData({ filiale_nome: "", filiale_indirizzo: "", filiale_citta: "", divisione: "nova" });
     } catch (err) {
       console.error(err);
     }
@@ -36,14 +37,11 @@ export default function CreaFiliale({ onCreate }) {
     <div className="form-container">
       <form onSubmit={handleSubmit} className="form-creation">
         <label>
-          ID:
-          <input
-            type="text"
-            name="filiale_id"
-            value={formData.filiale_id}
-            onChange={handleChange}
-            required
-          />
+          Divisione:
+          <select name="divisione" value={formData.divisione} onChange={handleChange} required>
+            <option value="nova">NOVA</option>
+            <option value="logi">LOGI</option>
+          </select>
         </label>
         <label>
           Nome:

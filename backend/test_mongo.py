@@ -1,11 +1,21 @@
-from flask import Flask
-from flask_pymongo import PyMongo
+from models.dipendenti import get_employees
+from database import get_db
 
-app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/nuova"
+db = get_db()
 
-mongo = PyMongo(app)
+def test_connection():
+    try:
+        employees = get_employees()
+        print("Connessione riuscita. Dipendenti trovati:")
+        for employee in employees:
+            print(employee)
+        
+        # Verifica i documenti nella collezione dipendenti_logi
+        print("Documenti nella collezione dipendenti_logi:")
+        for doc in db.dipendenti_logi.find():
+            print(doc)
+    except Exception as e:
+        print("Errore nella connessione a MongoDB Atlas:", str(e))
 
-with app.app_context():
-    print("Connessione al database:", mongo.db)
-    print("Collezioni disponibili:", mongo.db.list_collection_names())
+if __name__ == "__main__":
+    test_connection()

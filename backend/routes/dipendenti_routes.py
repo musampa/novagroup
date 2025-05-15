@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from bson.objectid import ObjectId
+from models.dipendenti import get_employees
 
 dipendenti_blueprint = Blueprint("dipendenti", __name__)
 
@@ -31,38 +32,31 @@ def create_dipendente():
 @dipendenti_blueprint.route("/", methods=["GET"])
 def get_dipendenti():
     try:
-        # Ottieni il parametro 'divisione' dalla query string
         divisione = request.args.get("divisione")
+        filtro = {}
+        if divisione:
+            filtro["divisione"] = divisione
+        dipendenti = get_employees(filtro)  # Recupera i dati filtrati (già lista)
 
-        from app import mongo
+        print("Documenti recuperati dalla collezione dipendenti_logi:", dipendenti)
+        for dipendente in dipendenti:
+            print(dipendente)
 
-        # Seleziona la collezione appropriata in base alla divisione
-        if divisione == "logi":
-            collection = mongo.db.dipendenti_logi
-        elif divisione == "nova":
-            collection = mongo.db.dipendenti_nova
-        else:
-            return jsonify({"error": "Divisione non valida"}), 400
-
-        # Recupera i dati direttamente dalla collezione
-        dipendenti = list(collection.find({}, {"_id": 1, "cognome": 1, "nome": 1, "mansione": 1, "divisione": 1, "filiale_nome": 1}))
-
-        # Prepara la risposta JSON
         response = [
             {
                 "id": str(dipendente["_id"]),
                 "cognome": dipendente.get("cognome"),
                 "nome": dipendente.get("nome"),
+                "filiale_nome": dipendente.get("filiale_nome", "Sconosciuta"),
                 "mansione": dipendente.get("mansione"),
                 "divisione": dipendente.get("divisione"),
-                "filiale_nome": dipendente.get("filiale_nome", "Sconosciuta")
             }
             for dipendente in dipendenti
         ]
 
         return jsonify(response), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500  # Gestisci eventuali errori
+        return jsonify({"error": str(e)}), 500
     
 # Aggiorna un dipendente
 @dipendenti_blueprint.route("/<id>", methods=["PUT"])

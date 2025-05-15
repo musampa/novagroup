@@ -28,10 +28,10 @@ export default function MagazzinoLogi() {
 
   const columns = React.useMemo(
     () => [
-      { Header: "Tipo", accessor: "tipo" },
-      { Header: "Taglia", accessor: "taglia" },
-      { Header: "Quantità", accessor: "quantita" },
-      { Header: "Data Inserimento", accessor: "dataInserimento", Cell: ({ value }) => {
+      { Header: "Tipo", accessor: "tipo", Filter: ColumnFilter },
+      { Header: "Taglia", accessor: "taglia", Filter: ColumnFilter },
+      { Header: "Quantità", accessor: "quantita", Filter: ColumnFilter },
+      { Header: "Data Inserimento", accessor: "dataInserimento", Filter: ColumnFilter, Cell: ({ value }) => {
           try {
             return value ? new Date(value).toLocaleDateString() : "N/A";
           } catch {
@@ -41,6 +41,17 @@ export default function MagazzinoLogi() {
     ],
     []
   );
+
+  function ColumnFilter({ column: { filterValue, setFilter } }) {
+    return (
+      <input
+        value={filterValue || ''}
+        onChange={e => setFilter(e.target.value || undefined)}
+        placeholder="Filtra..."
+        style={{ width: '90%', marginTop: 4 }}
+      />
+    );
+  }
 
   const tableInstance = useTable({ columns, data: magazzinoLogi }, useFilters, useSortBy);
 
@@ -64,6 +75,7 @@ export default function MagazzinoLogi() {
               {headerGroup.headers.map((column) => (
                 <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                   {column.render("Header")}
+                  <div>{column.canFilter ? column.render('Filter') : null}</div>
                   <span>
                     {column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}
                   </span>

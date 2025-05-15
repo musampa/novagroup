@@ -16,8 +16,6 @@ export default function Sidebar({ onMenuSelect }) {
               { title: "Lista Dipendenti NOVA", itemId: "/dipendenti/nova" },
               { title: "Lista Dipendenti LOGI", itemId: "/dipendenti/logi" },
               { title: "Crea Dipendenti", itemId: "/dipendenti/crea" },
-              { title: "Modifica Dipendenti", itemId: "/dipendenti/modifica" },
-              { title: "Elimina Dipendenti", itemId: "/dipendenti/elimina" },
             ],
           },
           {
@@ -27,8 +25,6 @@ export default function Sidebar({ onMenuSelect }) {
               { title: "Lista Filiali NOVA", itemId: "/filiali/nova" },
               { title: "Lista Filiali LOGI", itemId: "/filiali/logi" },
               { title: "Crea Filiale", itemId: "/filiali/crea" },
-              { title: "Modifica Filiale", itemId: "/filiali/modifica" },
-              { title: "Elimina Filiale", itemId: "/filiali/elimina" },
             ],
           },
           {

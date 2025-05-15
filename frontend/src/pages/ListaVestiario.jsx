@@ -4,6 +4,7 @@ export default function ListaVestiario() {
   const [vestiario, setVestiario] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({ tipo: '', taglia: '', quantita: '', data_inserimento: '' });
 
   useEffect(() => {
     const fetchVestiario = async () => {
@@ -20,9 +21,15 @@ export default function ListaVestiario() {
         setLoading(false);
       }
     };
-
     fetchVestiario();
   }, []);
+
+  const filteredVestiario = vestiario.filter(item =>
+    (filters.tipo === '' || (item.tipo || '').toLowerCase().includes(filters.tipo.toLowerCase())) &&
+    (filters.taglia === '' || (item.taglia || '').toLowerCase().includes(filters.taglia.toLowerCase())) &&
+    (filters.quantita === '' || String(item.quantita || '').includes(filters.quantita)) &&
+    (filters.data_inserimento === '' || (item.data_inserimento && new Date(item.data_inserimento).toLocaleDateString().includes(filters.data_inserimento)))
+  );
 
   if (loading) {
     return <p>Caricamento in corso...</p>;
@@ -35,6 +42,36 @@ export default function ListaVestiario() {
   return (
     <div className="vestiario-container">
       <h1>Lista Vestiario</h1>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        <input
+          type="text"
+          placeholder="Filtra Tipo"
+          value={filters.tipo}
+          onChange={e => setFilters(f => ({ ...f, tipo: e.target.value }))}
+          style={{ width: 120 }}
+        />
+        <input
+          type="text"
+          placeholder="Filtra Taglia"
+          value={filters.taglia}
+          onChange={e => setFilters(f => ({ ...f, taglia: e.target.value }))}
+          style={{ width: 80 }}
+        />
+        <input
+          type="text"
+          placeholder="Filtra Quantità"
+          value={filters.quantita}
+          onChange={e => setFilters(f => ({ ...f, quantita: e.target.value }))}
+          style={{ width: 80 }}
+        />
+        <input
+          type="text"
+          placeholder="Filtra Data (gg/mm/aaaa)"
+          value={filters.data_inserimento}
+          onChange={e => setFilters(f => ({ ...f, data_inserimento: e.target.value }))}
+          style={{ width: 140 }}
+        />
+      </div>
       <table className="vestiario-table">
         <thead>
           <tr>
@@ -45,7 +82,7 @@ export default function ListaVestiario() {
           </tr>
         </thead>
         <tbody>
-          {vestiario.map((item) => (
+          {filteredVestiario.map((item) => (
             <tr key={item.id}>
               <td>{item.tipo}</td>
               <td>{item.taglia}</td>
