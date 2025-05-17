@@ -8,6 +8,8 @@ from routes.mezzi_routes import mezzi_blueprint
 from flask import Blueprint
 from exstensions import mongo
 from datetime import datetime
+from bson.objectid import ObjectId
+from flask import jsonify
 
 from flask import Blueprint
 
@@ -144,10 +146,17 @@ def assegna_vestiario():
             print("Errore: quantità insufficiente. Disponibile:", documento.get("quantita"), "Richiesta:", quantita)  # Log per debug
             return {"message": "Errore: quantità insufficiente nel magazzino"}, 400
 
-        # Aggiorna la giacenza nel magazzino
+        # Aggiorna la giacenza nel magazzino CORRETTO
         try:
+            if divisione == "logi":
+                magazzino = mongo.db.magazzino_logi
+            elif divisione == "nova":
+                magazzino = mongo.db.magazzino_nova
+            else:
+                return {"message": f"Divisione non valida: {divisione}"}, 400
+
             result = magazzino.update_one(
-                {"tipo": tipo, "taglia": taglia, "divisione": divisione},
+                {"tipo": tipo, "taglia": taglia},
                 {"$inc": {"quantita": -quantita}}
             )
             print("Risultato dell'aggiornamento:", result.raw_result)  # Log per debug
@@ -206,15 +215,55 @@ def get_disponibilita_magazzino():
 @magazzino_blueprint.route('/vestiario_assegnato', methods=['GET'])
 def get_vestiario_assegnato():
     try:
-        # Recupera tutte le assegnazioni dalla collezione `vestiario_assegnato`
-        assegnazioni = list(mongo.db.vestiario_assegnato.find({}, {"_id": 0}))
+        # Recupera tutte le assegnazioni dalla collezione `vestiario_assegnato` (includi _id)
+        assegnazioni = list(mongo.db.vestiario_assegnato.find({}))
 
-        # Formatta le date come stringhe ISO 8601
+        # Formatta le date e l'_id come stringa
         for assegnazione in assegnazioni:
             if "dataAssegnazione" in assegnazione:
                 assegnazione["dataAssegnazione"] = assegnazione["dataAssegnazione"].isoformat() if isinstance(assegnazione["dataAssegnazione"], datetime) else assegnazione["dataAssegnazione"]
+            if "_id" in assegnazione:
+                assegnazione["_id"] = str(assegnazione["_id"])
 
         return dumps(assegnazioni), 200
     except Exception as e:
         print("Errore durante il recupero delle assegnazioni:", str(e))  # Log per debug
         return {"message": "Errore durante il recupero delle assegnazioni", "error": str(e)}, 500
+
+@magazzino_blueprint.route('/vestiario_assegnato/<id>', methods=['DELETE'])
+def delete_vestiario_assegnato(id):
+    from flask import request
+    import traceback
+    try:
+        # Recupera l'assegnazione da eliminare
+        assegnazione = mongo.db.vestiario_assegnato.find_one({'_id': ObjectId(id)})
+        if not assegnazione:
+            return jsonify({"message": "Assegnazione non trovata", "id": id}), 404
+
+        # Recupera i dati necessari
+        tipo = assegnazione.get('tipo')
+        taglia = assegnazione.get('taglia')
+        quantita = int(assegnazione.get('quantita', 0))
+        divisione = assegnazione.get('divisione')
+
+        # Cancella l'assegnazione
+        mongo.db.vestiario_assegnato.delete_one({'_id': ObjectId(id)})
+
+        # Aggiorna la giacenza nella collection corretta
+        if divisione == 'logi':
+            magazzino = mongo.db.magazzino_logi
+        elif divisione == 'nova':
+            magazzino = mongo.db.magazzino_nova
+        else:
+            return jsonify({"message": f"Divisione non valida: {divisione}", "id": id}), 400
+
+        magazzino.update_one(
+            {"tipo": tipo, "taglia": taglia},
+            {"$inc": {"quantita": quantita}},
+            upsert=True
+        )
+
+        return jsonify({"message": "Assegnazione eliminata e giacenza aggiornata", "id": id}), 200
+    except Exception as e:
+        print("[ERRORE DELETE]", traceback.format_exc())
+        return jsonify({"message": "Errore durante la cancellazione dell'assegnazione", "error": str(e), "id": id}), 500

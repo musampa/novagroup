@@ -105,10 +105,16 @@ export default function AssegnaVestiario() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Trova la filiale selezionata
+      const filialeObj = filiali.find(f => String(f.id || f._id || f.filiale_id || f.id_filiale) === String(formData.filiale));
+      const filialePayload = filialeObj
+        ? { filiale_id: filialeObj.filiale_id || filialeObj.id || filialeObj._id || filialeObj.id_filiale, filiale_nome: filialeObj.filiale_nome || filialeObj.filiale_cantiere || filialeObj.nome }
+        : formData.filiale;
+      const payload = { ...formData, filiale: filialePayload };
       const response = await fetch("/api/magazzino/assegna-vestiario", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) throw new Error("Errore durante l'assegnazione del vestiario");

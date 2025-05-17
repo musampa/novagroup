@@ -21,7 +21,7 @@ export default function AssegnazioniVestiario() {
 
   const fetchAssegnazioni = async () => {
     try {
-      const response = await fetch("/vestiario_assegnato");
+      const response = await fetch("/api/magazzino/vestiario_assegnato");
       if (!response.ok) throw new Error("Errore durante il recupero delle assegnazioni");
       const data = await response.json();
       setAssegnazioni(data);
@@ -42,9 +42,16 @@ export default function AssegnazioniVestiario() {
     }
   };
 
-  // Cerca il nome della filiale (filiale_nome) dato l'id
-  const getNomeFiliale = (id) => {
-    const f = filiali.find(f => String(f.id || f._id || f.filiale_id) === String(id));
+  // Cerca il nome della filiale (filiale_nome) dato l'id o l'oggetto filiale
+  const getNomeFiliale = (filiale) => {
+    if (!filiale) return '-';
+    // Se è già un oggetto con nome
+    if (typeof filiale === 'object') {
+      return filiale.filiale_nome || filiale.filiale_cantiere || filiale.nome || '-';
+    }
+    // Altrimenti cerca tra le filiali per id
+    const id = String(filiale);
+    const f = filiali.find(f => String(f.id || f._id || f.filiale_id) === id);
     return f ? (f.filiale_nome || f.filiale_cantiere || f.nome || '-') : '-';
   };
 
