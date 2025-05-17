@@ -164,8 +164,11 @@ export default function AssegnaVestiario() {
           >
             <MenuItem value=""><em>Seleziona...</em></MenuItem>
             {filiali.map((filiale) => (
-              <MenuItem key={filiale.id} value={filiale.id}>
-                {filiale.filiale_nome}
+              <MenuItem
+                key={filiale.id || filiale._id || filiale.filiale_id || filiale.id_filiale}
+                value={filiale.id || filiale._id || filiale.filiale_id || filiale.id_filiale}
+              >
+                {filiale.filiale_nome || filiale.filiale_cantiere || filiale.nome}
               </MenuItem>
             ))}
           </Select>

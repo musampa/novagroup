@@ -24,24 +24,25 @@ def inserisci_magazzino():
     from flask import request
     from datetime import datetime
     try:
-        # Recupera i dati dal corpo della richiesta
         dati = request.get_json()
         if not dati:
             return {"message": "Dati mancanti"}, 400
 
-        # Verifica e converte il campo 'quantita' in un intero
         for record in dati:
             if "quantita" in record:
                 try:
                     record["quantita"] = int(record["quantita"])
                 except (ValueError, TypeError):
                     return {"message": "Errore: il campo 'quantita' deve essere un numero valido."}, 400
+            record['dataInserimento'] = datetime.utcnow()
 
-        # Aggiunge il campo dataInserimento a ogni elemento
-        for elemento in dati:
-            elemento['dataInserimento'] = datetime.utcnow()
-        # Inserisce i dati nella collezione "magazzino"
-        mongo.db.magazzino.insert_many(dati)
+        # Inserisci in magazzino_logi o magazzino_nova in base alla divisione
+        logi = [r for r in dati if r.get('divisione') == 'logi']
+        nova = [r for r in dati if r.get('divisione') == 'nova']
+        if logi:
+            mongo.db.magazzino_logi.insert_many(logi)
+        if nova:
+            mongo.db.magazzino_nova.insert_many(nova)
         return {"message": "Dati inseriti con successo"}, 201
     except Exception as e:
         return {"message": "Errore durante l'inserimento", "error": str(e)}, 500
@@ -52,18 +53,29 @@ def inserisci_vestiario():
     from datetime import datetime
     try:
         print("Endpoint '/inserisci-vestiario' chiamato")  # Log per debug
-        # Recupera i dati dal corpo della richiesta
         dati = request.get_json()
         if not dati:
             return {"message": "Dati mancanti"}, 400
 
-        # Aggiungi la data di creazione a ogni record
+        # Inserimento per divisione
+        dati_logi = []
+        dati_nova = []
         for record in dati:
             record["dataAssegnazione"] = datetime.utcnow()
             record['dataInserimento'] = datetime.utcnow()
+            divisione = record.get("divisione")
+            if divisione == "logi":
+                dati_logi.append(record)
+            elif divisione == "nova":
+                dati_nova.append(record)
+            else:
+                return {"message": f"Divisione non valida: {divisione}"}, 400
 
-        # Inserisce i dati nella collezione "magazzino"
-        mongo.db.magazzino.insert_many(dati)
+        if dati_logi:
+            mongo.db.magazzino_logi.insert_many(dati_logi)
+        if dati_nova:
+            mongo.db.magazzino_nova.insert_many(dati_nova)
+
         return {"message": "Vestiario inserito con successo"}, 201
     except Exception as e:
         return {"message": "Errore durante l'inserimento del vestiario", "error": str(e)}, 500
@@ -71,13 +83,10 @@ def inserisci_vestiario():
 @magazzino_blueprint.route('/nova', methods=['GET'])
 def get_magazzino_nova():
     try:
-        dati_nova = list(mongo.db.magazzino.find({"divisione": "nova"}))
-
-        # Formatta le date come stringhe ISO 8601
+        dati_nova = list(mongo.db.magazzino_nova.find({}))
         for elemento in dati_nova:
             if "dataInserimento" in elemento:
                 elemento["dataInserimento"] = elemento["dataInserimento"].isoformat() if isinstance(elemento["dataInserimento"], datetime) else elemento["dataInserimento"]
-
         return dumps(dati_nova), 200
     except Exception as e:
         return {"message": "Errore durante il recupero dei dati del magazzino Nova", "error": str(e)}, 500
@@ -85,13 +94,10 @@ def get_magazzino_nova():
 @magazzino_blueprint.route('/logi', methods=['GET'])
 def get_magazzino_logi():
     try:
-        dati_logi = list(mongo.db.magazzino.find({"divisione": "logi"}))
-
-        # Formatta le date come stringhe ISO 8601
+        dati_logi = list(mongo.db.magazzino_logi.find({}))
         for elemento in dati_logi:
             if "dataInserimento" in elemento:
                 elemento["dataInserimento"] = elemento["dataInserimento"].isoformat() if isinstance(elemento["dataInserimento"], datetime) else elemento["dataInserimento"]
-
         return dumps(dati_logi), 200
     except Exception as e:
         return {"message": "Errore durante il recupero dei dati del magazzino Logi", "error": str(e)}, 500
@@ -212,41 +218,3 @@ def get_vestiario_assegnato():
     except Exception as e:
         print("Errore durante il recupero delle assegnazioni:", str(e))  # Log per debug
         return {"message": "Errore durante il recupero delle assegnazioni", "error": str(e)}, 500
-
-app = Flask(__name__)
-
-# Configurazione MongoDB
-app.config["MONGO_URI"] = "mongodb://localhost:27017/nuova"  # Modifica in base alla tua configurazione
-mongo = PyMongo(app)
-
-# Inizializza mongo
-mongo.init_app(app)
-
-# Log per verificare la connessione
-with app.app_context():
-    print("MongoDB URI:", app.config["MONGO_URI"])
-    print("Database attivo:", mongo.db)
-
-# Inizializza i blueprint per ogni entità
-app.register_blueprint(filiali_blueprint, url_prefix="/api/filiali")
-app.register_blueprint(dipendenti_blueprint, url_prefix="/api/dipendenti")
-app.register_blueprint(vestiario_blueprint, url_prefix="/api/vestiario")
-app.register_blueprint(magazzino_blueprint, url_prefix="/api/magazzino")
-app.register_blueprint(mezzi_blueprint, url_prefix="/api/mezzi")
-
-@app.route("/test-connessione")
-def test_connessione():
-    try:
-        # Esegui una semplice operazione sul database
-        mongo.db.command("ping")
-        return {"message": "Connessione al database riuscita!"}, 200
-    except Exception as e:
-        return {"message": "Errore di connessione al database", "error": str(e)}, 500
-
-# Endpoint di test
-@app.route("/")
-def index():
-    return {"message": "API azienda attiva"}
-
-if __name__ == "__main__":
-    app.run(debug=True)

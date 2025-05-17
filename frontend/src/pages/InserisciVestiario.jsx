@@ -35,6 +35,14 @@ export default function InserisciVestiario() {
     setFormData([...formData, { tipo: "", taglia: "", quantita: 1, divisione: "" }]);
   };
 
+  const removeRow = (index) => {
+    if (formData.length === 1) {
+      setFormData([{ tipo: "", taglia: "", quantita: 1, divisione: "" }]);
+    } else {
+      setFormData(formData.filter((_, i) => i !== index));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -58,7 +66,7 @@ export default function InserisciVestiario() {
       <h2 style={{ textTransform: 'uppercase', fontSize: 32, letterSpacing: 1, fontWeight: 700, color: '#fff', marginBottom: 24, textAlign: 'center' }}>Inserisci Vestiario</h2>
       <form onSubmit={handleSubmit} className="form-creation" style={{ background: '#232526', borderRadius: 12, padding: 24, boxShadow: '0 2px 16px #0002', color: '#fff', maxWidth: 520, margin: '0 auto', border: 'none' }}>
         {formData.map((row, index) => (
-          <div key={index} style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+          <div key={index} style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'center' }}>
             <FormControl variant="standard" sx={{ minWidth: 120, flex: 1 }}>
               <InputLabel shrink style={{ color: '#51cbce' }}>Divisione</InputLabel>
               <Select
@@ -122,6 +130,14 @@ export default function InserisciVestiario() {
               sx={{ width: 90, input: { color: '#fff' }, label: { color: '#51cbce' } }}
               inputProps={{ min: 1 }}
             />
+            <button
+              type="button"
+              onClick={() => removeRow(index)}
+              style={{ background: '#e57373', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 12px', fontWeight: 600, fontSize: 15, marginLeft: 6, cursor: 'pointer' }}
+              aria-label="Rimuovi riga"
+            >
+              &times;
+            </button>
           </div>
         ))}
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>

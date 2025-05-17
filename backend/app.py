@@ -7,14 +7,15 @@ from routes.magazzino_routes import magazzino_blueprint
 from routes.mezzi_routes import mezzi_blueprint
 from exstensions import mongo  # Importa mongo correttamente dal modulo extensions
 from flask_cors import CORS  # Importa CORS
+from config import MONGO_URI  # <--- Usa la variabile d'ambiente
 
 app = Flask(__name__)
 
 # Permetti richieste da http://localhost:5173
 CORS(app, origins=["http://localhost:5173"])
 
-# Configurazione MongoDB
-app.config["MONGO_URI"] = "mongodb://localhost:27017/nuova"  # Modifica in base alla tua configurazione
+# Configurazione MongoDB: usa sempre la variabile d'ambiente (Atlas se .env è configurato)
+app.config["MONGO_URI"] = MONGO_URI
 
 # Inizializza mongo
 mongo.init_app(app)

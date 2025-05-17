@@ -18,6 +18,7 @@ import MagazzinoLogi from "./pages/MagazzinoLogi";
 import MagazzinoNova from "./pages/MagazzinoNova";
 import AssegnaVestiario from "./pages/AssegnaVestiario";
 import VestiarioAssegnato from "./pages/Magazzino/VestiarioAssegnato";
+import AssegnazioniVestiario from "./pages/AssegnazioniVestiario";
 import "./styles/global.css";
 import './styles/Login.css';
 
@@ -93,7 +94,8 @@ export default function App() {
                   <Route path="/magazzino/nova" element={<MagazzinoNova />} />
                   <Route path="/magazzino/inserisci" element={<InserisciVestiario />} />
                   <Route path="/magazzino/assegna" element={<AssegnaVestiario />} />
-                  <Route path="/magazzino/vestiario_assegnato" element={<VestiarioAssegnato />} />
+                  <Route path="/magazzino/vestiario_assegnato" element={<AssegnazioniVestiario />} />
+                  <Route path="/assegnazioni-vestiario" element={<AssegnazioniVestiario />} />
                   <Route path="/" element={<Navigate to="/login" replace />} />
                   <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>
