@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { MantineProvider } from '@mantine/core';
 import Header from "./components/Header";
@@ -26,6 +26,16 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Stato di login
   const [userName, setUserName] = useState(""); // Nome dell'utente loggato
   const navigate = useNavigate();
+
+  // Effetto: su ogni reload, forza logout e redirect a /login
+  useEffect(() => {
+    setIsLoggedIn(false);
+    setUserName("");
+    if (window.location.pathname !== "/login") {
+      navigate("/login", { replace: true });
+    }
+    // eslint-disable-next-line
+  }, []);
 
   const handleLogin = (name) => {
     console.log("Effettuato login per:", name);

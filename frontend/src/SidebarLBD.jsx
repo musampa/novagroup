@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Nav } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import "/css/fa-override.css";
 
 const sidebarStyle = {
   height: "100%",

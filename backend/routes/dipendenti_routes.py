@@ -38,10 +38,6 @@ def get_dipendenti():
             filtro["divisione"] = divisione
         dipendenti = get_employees(filtro)  # Recupera i dati filtrati (già lista)
 
-        print("Documenti recuperati dalla collezione dipendenti_logi:", dipendenti)
-        for dipendente in dipendenti:
-            print(dipendente)
-
         response = [
             {
                 "id": str(dipendente["_id"]),

@@ -109,7 +109,6 @@ def assegna_vestiario():
     from flask import request
     try:
         elemento = request.get_json()
-        print("Dati ricevuti:", elemento)  # Log per debug
         if not elemento:
             return {"message": "Dati mancanti"}, 400
 
@@ -122,46 +121,39 @@ def assegna_vestiario():
         if not all([tipo, taglia, quantita, divisione, filiale]):
             return {"message": "Campi mancanti"}, 400
 
-        # Verifica che il campo 'quantita' nel database sia numerico
-        magazzino = mongo.db.magazzino
-        documento = magazzino.find_one({"tipo": tipo, "taglia": taglia, "divisione": divisione})
-        print("Documento trovato nel magazzino:", documento)  # Log per debug
+        # Seleziona la collection corretta in base alla divisione
+        if divisione == "logi":
+            magazzino = mongo.db.magazzino_logi
+        elif divisione == "nova":
+            magazzino = mongo.db.magazzino_nova
+        else:
+            return {"message": f"Divisione non valida: {divisione}"}, 400
+
+        # Cerca il documento nella collection corretta
+        documento = magazzino.find_one({"tipo": tipo, "taglia": taglia})
         if documento:
             if not isinstance(documento.get("quantita"), (int, float)):
                 try:
                     documento["quantita"] = int(documento["quantita"])
-                    print("Convertito 'quantita' in intero:", documento["quantita"])  # Log per debug
                     # Aggiorna il campo 'quantita' nel database se necessario
                     magazzino.update_one(
                         {"_id": documento["_id"]},
                         {"$set": {"quantita": documento["quantita"]}}
                     )
-                    print("Campo 'quantita' aggiornato nel database.")
                 except ValueError:
-                    print("Errore: impossibile convertire 'quantita' in intero. Valore:", documento["quantita"])  # Log per debug
                     return {"message": "Errore: il campo 'quantita' nel database non è numerico e non può essere convertito"}, 500
 
         # Controlla se la quantità richiesta è disponibile
-        if documento.get("quantita", 0) < quantita:
-            print("Errore: quantità insufficiente. Disponibile:", documento.get("quantita"), "Richiesta:", quantita)  # Log per debug
+        if not documento or documento.get("quantita", 0) < quantita:
             return {"message": "Errore: quantità insufficiente nel magazzino"}, 400
 
         # Aggiorna la giacenza nel magazzino CORRETTO
         try:
-            if divisione == "logi":
-                magazzino = mongo.db.magazzino_logi
-            elif divisione == "nova":
-                magazzino = mongo.db.magazzino_nova
-            else:
-                return {"message": f"Divisione non valida: {divisione}"}, 400
-
             result = magazzino.update_one(
                 {"tipo": tipo, "taglia": taglia},
                 {"$inc": {"quantita": -quantita}}
             )
-            print("Risultato dell'aggiornamento:", result.raw_result)  # Log per debug
         except Exception as update_error:
-            print("Errore durante l'aggiornamento della giacenza:", str(update_error))  # Log per debug
             return {"message": "Errore durante l'aggiornamento della giacenza", "error": str(update_error)}, 500
 
         # Registra l'assegnazione
@@ -177,14 +169,11 @@ def assegna_vestiario():
         # Inserisce l'assegnazione nella collezione `vestiario_assegnato`
         try:
             insert_result = mongo.db.vestiario_assegnato.insert_one(assegnazione)
-            print("Risultato dell'inserimento:", insert_result.inserted_id)  # Log per debug
         except Exception as insert_error:
-            print("Errore durante l'inserimento dell'assegnazione:", str(insert_error))  # Log per debug
             return {"message": "Errore durante l'inserimento dell'assegnazione", "error": str(insert_error)}, 500
 
         return {"message": "Assegnazione completata"}, 201
     except Exception as e:
-        print("Errore durante l'assegnazione:", str(e))  # Log per debug
         return {"message": "Errore durante l'assegnazione", "error": str(e)}, 500
 
 @magazzino_blueprint.route('/disponibilita', methods=['GET'])

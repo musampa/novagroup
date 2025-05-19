@@ -169,9 +169,14 @@ export default function AssegnaVestiario() {
             disabled={!formData.divisione}
           >
             <MenuItem value=""><em>Seleziona...</em></MenuItem>
-            {filiali.map((filiale) => (
+            {filiali.map((filiale, idx) => (
               <MenuItem
-                key={filiale.id || filiale._id || filiale.filiale_id || filiale.id_filiale}
+                key={
+                  (filiale.id || filiale._id || filiale.filiale_id || filiale.id_filiale || "") +
+                  "-" +
+                  (filiale.filiale_nome || filiale.filiale_cantiere || filiale.nome || "") +
+                  "-" + idx
+                }
                 value={filiale.id || filiale._id || filiale.filiale_id || filiale.id_filiale}
               >
                 {filiale.filiale_nome || filiale.filiale_cantiere || filiale.nome}
